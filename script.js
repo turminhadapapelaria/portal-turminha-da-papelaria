@@ -30,7 +30,10 @@ const films = [
 ];
 const coloring = [
   {name:'Bia',file:'bia-colorir.png'}, {name:'Lino',file:'lino-colorir.png'},
-  {name:'Isa',file:'isa-colorir.png'}, {name:'Aquarela',file:'aquarela-colorir.png'}
+  {name:'Isa',file:'isa-colorir.png'}, {name:'Aquarela',file:'aquarela-colorir.png'},
+  {name:'Fada Papelina',file:'fada-papelina-colorir.png'},
+  {name:'Laboratório do Professor Borrachão',file:'laboratorio-professor-borrachao-colorir.png'},
+  {name:'Árvore da Criatividade',file:'arvore-da-criatividade-colorir.png'}
 ];
 const characterGrid=document.querySelector('#character-grid');
 function renderCharacters(filter='all'){
