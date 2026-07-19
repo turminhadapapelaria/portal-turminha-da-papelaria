@@ -35,6 +35,16 @@ const coloring = [
   {name:'Laboratório do Professor Borrachão',file:'laboratorio-professor-borrachao-colorir.png'},
   {name:'Árvore da Criatividade',file:'arvore-da-criatividade-colorir.png'}
 ];
+const wallpapers = [
+  {name:'Rio das Tintas',file:'rio-das-tintas'},
+  {name:'Árvore da Criatividade',file:'arvore-da-criatividade'},
+  {name:'Ateliê das Cores',file:'atelie-das-cores'},
+  {name:'Bairro dos Cadernos',file:'bairro-dos-cadernos'},
+  {name:'Castelo da Criatividade',file:'castelo-da-criatividade'},
+  {name:'Floresta de Lápis',file:'floresta-de-lapis'},
+  {name:'Papelópolis',file:'papelopolis'},
+  {name:'Vale das Fagulhas',file:'vale-das-fagulhas'}
+];
 const characterGrid=document.querySelector('#character-grid');
 function renderCharacters(filter='all'){
   characterGrid.innerHTML=characters.filter(c=>filter==='all'||c.type===filter).map(c=>`<button class="character-card ${c.type}" type="button" data-character="${c.name}"><span class="role">${c.role}</span><img src="assets/characters/${c.image}" alt="${c.name}" loading="lazy"><div><h3>${c.name}</h3><p>Conheça este personagem →</p></div></button>`).join('');
@@ -45,6 +55,8 @@ const filmRow=document.querySelector('#film-row');
 filmRow.innerHTML=films.map(f=>`<button class="film-card" type="button" data-video="${f.id}" style="--poster:${f.color}"><span class="poster"><span>▶</span></span><h3>${f.title}</h3></button>`).join('');
 const gallery=document.querySelector('#coloring-gallery');
 gallery.innerHTML=coloring.map(c=>`<article class="coloring-card"><img src="assets/coloring/${c.file}" alt="Desenho de ${c.name} para colorir" loading="lazy"><div class="coloring-actions"><button type="button" data-print="assets/coloring/${c.file}">Imprimir</button><a href="assets/coloring/${c.file}" download>Baixar</a></div></article>`).join('');
+const wallpaperGallery=document.querySelector('#wallpaper-gallery');
+wallpaperGallery.innerHTML=wallpapers.map(w=>`<article class="wallpaper-card"><div class="wallpaper-preview"><img src="assets/wallpaper-${w.file}-preview.webp" alt="Papel de parede ${w.name}" loading="lazy"></div><h3>${w.name}</h3><p>1080 × 1920 px</p><a href="assets/wallpaper-${w.file}.jpg" download aria-label="Baixar papel de parede ${w.name}">↓ Baixar</a></article>`).join('');
 const dialog=document.querySelector('#media-dialog');const dialogBody=document.querySelector('#dialog-body');
 function openVideo(id){const film=films.find(f=>f.id===id);if(!film)return;dialogBody.innerHTML=`<video controls autoplay playsinline preload="metadata"><source src="assets/videos-web/${film.file}" type="video/mp4">Seu navegador não conseguiu reproduzir este vídeo.</video>`;dialog.showModal()}
 document.addEventListener('click',e=>{const video=e.target.closest('[data-video]');if(video)openVideo(video.dataset.video);const card=e.target.closest('[data-character]');if(card){const c=characters.find(x=>x.name===card.dataset.character);dialogBody.innerHTML=`<div class="character-detail"><img src="assets/characters/${c.image}" alt="${c.name}"><div><span class="tag">${c.role}</span><h2>${c.name}</h2><p class="archetype">${c.archetype}</p><p>${c.description}</p><dl><dt>Forças</dt><dd>${c.strengths}</dd><dt>Fraqueza</dt><dd>${c.weakness}</dd><dt>Elemento-símbolo</dt><dd>${c.symbol}</dd></dl></div></div>`;dialog.showModal()}const print=e.target.closest('[data-print]');if(print){const w=window.open(print.dataset.print,'_blank');w?.addEventListener('load',()=>w.print())}});
