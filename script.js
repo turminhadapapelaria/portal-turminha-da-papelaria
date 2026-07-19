@@ -17,16 +17,16 @@ const characters = [
   {name:'Some Tampas',type:'villains',role:'Vilão',archetype:'Caos / Destruidor / Bagunceiro',image:'some-tampas.webp',description:'O vilão bagunceiro que some com tudo o que encontra pela frente.',strengths:'Rapidez, habilidade para se esconder e causar confusão.',weakness:'Distrai-se com facilidade, não gosta de limpeza e odeia organização.',symbol:'Tampa'}
 ];
 const films = [
-  {id:'video-aquarela-zig',title:'Aquarela e Zig na Papelaria',file:'aquarela-e-zig.mp4',color:'#d84b94'},
-  {id:'video-estojo',title:'Estojo do Amor',file:'estojo-do-amor.mp4',color:'#ff646d'},
-  {id:'video-grampzilla',title:'Grampzilla Ataca',file:'grampzilla-ataca.mp4',color:'#3f9e45'},
-  {id:'video-isa',title:'Isa e a Invenção Mágica',file:'isa-e-a-invencao-magica.mp4',color:'#7555c8'},
-  {id:'video-ideias',title:'Onde as Ideias Ganham Vida',file:'onde-as-ideias-ganham-vida.mp4',color:'#e89423'},
-  {id:'video-papelopolis',title:'Papelópolis',file:'papelopolis.mp4',color:'#1677c8'},
-  {id:'video-cores',title:'Confie nas Suas Cores',file:'confie-nas-suas-cores.mp4',color:'#ed4b75'},
-  {id:'video-jingle',title:'Jingle Turminha da Papelaria',file:'jingle-turminha.mp4',color:'#22a99c'},
-  {id:'video-lino-tico',title:'Lino e Tico Fogo na Papelaria Fofa',file:'lino-e-tico-fogo.mp4',color:'#ef7b30'},
-  {id:'video-persistir',title:'Persistir é Conquistar',file:'persistir-e-conquistar.mp4',color:'#3d6fc2'}
+  {id:'video-aquarela-zig',title:'Aquarela e Zig na Papelaria',file:'aquarela-e-zig.mp4',color:'#e44591',images:['aquarela.webp','zig.webp']},
+  {id:'video-estojo',title:'Estojo do Amor',file:'estojo-do-amor.mp4',color:'#ff6470',images:['ziper-zaza.webp','bia.webp']},
+  {id:'video-grampzilla',title:'Grampzilla Ataca',file:'grampzilla-ataca.mp4',color:'#52a643',images:['grampizilla.webp','lino.webp']},
+  {id:'video-isa',title:'Isa e a Invenção Mágica',file:'isa-e-a-invencao-magica.mp4',color:'#7358c9',images:['isa.webp','professor-borrachao.webp']},
+  {id:'video-ideias',title:'Onde as Ideias Ganham Vida',file:'onde-as-ideias-ganham-vida.mp4',color:'#f0a51d',images:['fada-papelina.webp','bia.webp']},
+  {id:'video-papelopolis',title:'Papelópolis',file:'papelopolis.mp4',color:'#188bc1',images:['cadu-caderno.webp','fada-papelina.webp']},
+  {id:'video-cores',title:'Confie nas Suas Cores',file:'confie-nas-suas-cores.mp4',color:'#ef4f79',images:['aquarela.webp','bia.webp']},
+  {id:'video-jingle',title:'Jingle Turminha da Papelaria',file:'jingle-turminha.mp4',color:'#18a99d',images:['bia.webp','lino.webp','tico-fogo.webp']},
+  {id:'video-lino-tico',title:'Lino e Tico Fogo na Papelaria Fofa',file:'lino-e-tico-fogo.mp4',color:'#f17a2e',images:['lino.webp','tico-fogo.webp']},
+  {id:'video-persistir',title:'Persistir é Conquistar',file:'persistir-e-conquistar.mp4',color:'#4373c6',images:['dino-leco.webp','lino.webp']}
 ];
 const coloring = [
   {name:'Bia',file:'bia-colorir.png'}, {name:'Lino',file:'lino-colorir.png'},
@@ -52,7 +52,7 @@ function renderCharacters(filter='all'){
 renderCharacters();
 document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(b=>b.classList.remove('active'));button.classList.add('active');renderCharacters(button.dataset.filter)}));
 const filmRow=document.querySelector('#film-row');
-filmRow.innerHTML=films.map(f=>`<button class="film-card" type="button" data-video="${f.id}" style="--poster:${f.color}"><span class="poster"><span>▶</span></span><h3>${f.title}</h3></button>`).join('');
+filmRow.innerHTML=films.map(f=>`<button class="film-card" type="button" data-video="${f.id}" style="--poster:${f.color}" aria-label="Assistir ${f.title}"><span class="poster">${f.images.map((image,index)=>`<img class="poster-character poster-character-${index+1}" src="assets/characters/${image}" alt="" loading="lazy">`).join('')}<span class="poster-brand">Turminha da Papelaria</span><span class="poster-play" aria-hidden="true">▶</span></span><h3>${f.title}</h3><span class="film-watch">Assistir agora →</span></button>`).join('');
 const gallery=document.querySelector('#coloring-gallery');
 gallery.innerHTML=coloring.map(c=>`<article class="coloring-card"><img src="assets/coloring/${c.file}" alt="Desenho de ${c.name} para colorir" loading="lazy"><div class="coloring-actions"><button type="button" data-print="assets/coloring/${c.file}">Imprimir</button><a href="assets/coloring/${c.file}" download>Baixar</a></div></article>`).join('');
 const wallpaperGallery=document.querySelector('#wallpaper-gallery');
@@ -91,3 +91,4 @@ document.querySelector('#comic-prev').addEventListener('click',()=>comicBook?.fl
 document.querySelector('#comic-next').addEventListener('click',()=>comicBook?.flipNext());
 document.querySelector('#comic-fullscreen').addEventListener('click',()=>{if(!document.fullscreenElement)comicDialog.requestFullscreen?.();else document.exitFullscreen?.()});
 document.addEventListener('keydown',e=>{if(!comicDialog.open)return;if(e.key==='ArrowRight')comicBook?.flipNext();if(e.key==='ArrowLeft')comicBook?.flipPrev();if(e.key==='Escape'&&comicDialog.open)comicDialog.close()});
+
