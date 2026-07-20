@@ -321,3 +321,189 @@ memoryBoard.addEventListener('click',event=>{
 memoryStartButton.addEventListener('click',startMemoryGame);
 memoryReset.addEventListener('click',startMemoryGame);
 readMemoryBest();
+
+const adventureLevels=[
+  {
+    name:'Bairro dos Cadernos',
+    background:'assets/wallpaper-bairro-dos-cadernos.jpg',
+    start:35,
+    exit:6,
+    ideas:[9,20,31],
+    obstacles:[1,8,15,22,29],
+    hazards:[12,26]
+  },
+  {
+    name:'Floresta de Lápis',
+    background:'assets/wallpaper-floresta-de-lapis.jpg',
+    start:41,
+    exit:0,
+    ideas:[7,17,23,32],
+    obstacles:[5,12,19,26],
+    hazards:[9,21,36]
+  },
+  {
+    name:'Castelo da Criatividade',
+    background:'assets/wallpaper-castelo-da-criatividade.jpg',
+    start:38,
+    exit:3,
+    ideas:[7,19,27,40],
+    obstacles:[8,9,15,25,26,32,33],
+    hazards:[11,21,30,35]
+  }
+];
+const adventureGrid=document.querySelector('#adventure-grid');
+const adventureStage=document.querySelector('#adventure-stage');
+const adventureStart=document.querySelector('#adventure-start');
+const adventureStartButton=document.querySelector('#adventure-start-button');
+const adventureTitle=document.querySelector('#adventure-title');
+const adventureMessage=document.querySelector('#adventure-message');
+const adventureAnnouncement=document.querySelector('#adventure-announcement');
+const adventureScore=document.querySelector('#adventure-score');
+const adventureLevel=document.querySelector('#adventure-level');
+const adventureIdeas=document.querySelector('#adventure-ideas');
+const adventureLives=document.querySelector('#adventure-lives');
+const adventureBest=document.querySelector('#adventure-best');
+const adventureReset=document.querySelector('#adventure-reset');
+const adventureMoves=document.querySelectorAll('[data-adventure-move]');
+let adventureState={level:0,position:35,score:0,lives:3,collected:new Set(),active:false,transitioning:false};
+
+function readAdventureBest(){
+  const best=Number(localStorage.getItem('turminha-adventure-best')||0);
+  adventureBest.textContent=best;
+  return best;
+}
+function updateAdventureStats(){
+  const level=adventureLevels[adventureState.level];
+  adventureScore.textContent=adventureState.score;
+  adventureLevel.textContent=`${adventureState.level+1}/${adventureLevels.length}`;
+  adventureIdeas.textContent=`${adventureState.collected.size}/${level.ideas.length}`;
+  adventureLives.textContent='♥'.repeat(adventureState.lives)+'♡'.repeat(3-adventureState.lives);
+}
+function announceAdventure(text){
+  adventureAnnouncement.textContent=text;
+  adventureAnnouncement.classList.remove('pop');
+  requestAnimationFrame(()=>adventureAnnouncement.classList.add('pop'));
+}
+function adventureTileLabel(index,level){
+  if(index===adventureState.position)return 'Lino';
+  if(level.obstacles.includes(index))return 'Obstáculo';
+  if(level.hazards.includes(index))return 'Mancha de tinta';
+  if(level.ideas.includes(index)&&!adventureState.collected.has(index))return 'Ideia brilhante';
+  if(index===level.exit)return adventureState.collected.size===level.ideas.length?'Portal aberto':'Portal fechado';
+  return 'Caminho livre';
+}
+function renderAdventure(){
+  const level=adventureLevels[adventureState.level];
+  const portalOpen=adventureState.collected.size===level.ideas.length;
+  adventureStage.style.setProperty('--adventure-bg',`url("${level.background}")`);
+  adventureGrid.setAttribute('aria-label',`Mapa: ${level.name}`);
+  adventureGrid.innerHTML=Array.from({length:42},(_,index)=>{
+    const classes=['adventure-tile'];
+    if(level.obstacles.includes(index))classes.push('obstacle');
+    if(level.hazards.includes(index))classes.push('hazard');
+    if(level.ideas.includes(index)&&!adventureState.collected.has(index))classes.push('idea');
+    if(index===level.exit)classes.push('portal',portalOpen?'open':'closed');
+    const player=index===adventureState.position?'<img class="adventure-player" src="assets/characters/lino.webp" alt="">':'';
+    return `<div class="${classes.join(' ')}" role="gridcell" aria-label="${adventureTileLabel(index,level)}">${player}</div>`;
+  }).join('');
+  updateAdventureStats();
+}
+function loadAdventureLevel(index){
+  const level=adventureLevels[index];
+  adventureState.level=index;
+  adventureState.position=level.start;
+  adventureState.collected=new Set();
+  adventureState.active=true;
+  adventureState.transitioning=false;
+  renderAdventure();
+  announceAdventure(`Fase ${index+1}: ${level.name}`);
+}
+function finishAdventure(won){
+  adventureState.active=false;
+  adventureState.transitioning=false;
+  const previousBest=readAdventureBest();
+  if(adventureState.score>previousBest){
+    localStorage.setItem('turminha-adventure-best',String(adventureState.score));
+    adventureBest.textContent=adventureState.score;
+  }
+  adventureTitle.textContent=won?'Papelópolis foi iluminada!':'Lino precisa de ajuda!';
+  adventureMessage.textContent=won
+    ? `Você completou as três fases com ${adventureState.score} pontos.`
+    : `As vidas acabaram. Você conquistou ${adventureState.score} pontos.`;
+  adventureStartButton.textContent='Jogar novamente';
+  adventureStart.hidden=false;
+}
+function completeAdventureLevel(){
+  adventureState.active=false;
+  adventureState.transitioning=true;
+  adventureState.score+=500;
+  updateAdventureStats();
+  if(adventureState.level===adventureLevels.length-1){
+    setTimeout(()=>finishAdventure(true),650);
+    return;
+  }
+  announceAdventure('Portal encontrado! Próxima fase...');
+  setTimeout(()=>loadAdventureLevel(adventureState.level+1),750);
+}
+function moveAdventure(dx,dy){
+  if(!adventureState.active||adventureState.transitioning)return;
+  const level=adventureLevels[adventureState.level];
+  const x=adventureState.position%7;
+  const y=Math.floor(adventureState.position/7);
+  const nextX=x+dx;
+  const nextY=y+dy;
+  if(nextX<0||nextX>6||nextY<0||nextY>5)return;
+  const next=nextY*7+nextX;
+  if(level.obstacles.includes(next)){
+    announceAdventure('Esse caminho está bloqueado.');
+    return;
+  }
+  adventureState.position=next;
+  if(level.hazards.includes(next)){
+    adventureState.lives-=1;
+    adventureState.score=Math.max(0,adventureState.score-100);
+    if(adventureState.lives===0){
+      renderAdventure();
+      finishAdventure(false);
+      return;
+    }
+    adventureState.position=level.start;
+    announceAdventure('Cuidado com a tinta! Você perdeu uma vida.');
+  }
+  if(level.ideas.includes(next)&&!adventureState.collected.has(next)){
+    adventureState.collected.add(next);
+    adventureState.score+=200;
+    announceAdventure(adventureState.collected.size===level.ideas.length?'Todas as ideias! O portal abriu.':'Ideia brilhante encontrada!');
+  }
+  renderAdventure();
+  if(next===level.exit){
+    if(adventureState.collected.size===level.ideas.length)completeAdventureLevel();
+    else announceAdventure('Encontre todas as ideias para abrir o portal.');
+  }
+}
+function startAdventure(){
+  adventureState={level:0,position:adventureLevels[0].start,score:0,lives:3,collected:new Set(),active:true,transitioning:false};
+  adventureTitle.textContent='Aventura em Papelópolis';
+  adventureMessage.textContent='Ajude Lino a encontrar as ideias e chegar ao portal.';
+  adventureStartButton.textContent='Jogar novamente';
+  adventureStart.hidden=true;
+  readAdventureBest();
+  loadAdventureLevel(0);
+}
+const adventureDirections={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+adventureMoves.forEach(button=>button.addEventListener('click',()=>{
+  const [dx,dy]=adventureDirections[button.dataset.adventureMove];
+  moveAdventure(dx,dy);
+}));
+document.addEventListener('keydown',event=>{
+  if(!adventureState.active)return;
+  const keyDirections={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};
+  const direction=keyDirections[event.key];
+  if(!direction)return;
+  event.preventDefault();
+  moveAdventure(...direction);
+});
+adventureStartButton.addEventListener('click',startAdventure);
+adventureReset.addEventListener('click',startAdventure);
+readAdventureBest();
+renderAdventure();
