@@ -197,3 +197,127 @@ function finishGame(won){
 }
 gameStartButton.addEventListener('click',startGame);
 gameReset.addEventListener('click',startGame);
+
+const memoryPairs=[
+  {id:'lino',character:'Lino',image:'lino.webp',material:'Lápis',icon:'✏'},
+  {id:'bia',character:'Bia',image:'bia.webp',material:'Coração',icon:'♥'},
+  {id:'cadu',character:'Cadu Caderno',image:'cadu-caderno.webp',material:'Régua',icon:'📏'},
+  {id:'dino',character:'Dino Leco',image:'dino-leco.webp',material:'Pegada de dinossauro',icon:'🐾'},
+  {id:'professor',character:'Professor Borrachão',image:'professor-borrachao.webp',material:'Esquadro',icon:'◢'},
+  {id:'capitao',character:'Capitão Apagão',image:'capitao-apagao.webp',material:'Pincel corretivo',icon:'🖌'},
+  {id:'conde',character:'Conde Confusão',image:'conde-confusao.webp',material:'Tesoura',icon:'✂'},
+  {id:'tampas',character:'Some Tampas',image:'some-tampas.svg',material:'Tampa',icon:'●'}
+];
+const memoryBoard=document.querySelector('#memory-board');
+const memoryStart=document.querySelector('#memory-start');
+const memoryStartButton=document.querySelector('#memory-start-button');
+const memoryTitle=document.querySelector('#memory-title');
+const memoryMessage=document.querySelector('#memory-message');
+const memoryAnnouncement=document.querySelector('#memory-announcement');
+const memoryMoves=document.querySelector('#memory-moves');
+const memoryMatches=document.querySelector('#memory-matches');
+const memoryTime=document.querySelector('#memory-time');
+const memoryBest=document.querySelector('#memory-best');
+const memoryReset=document.querySelector('#memory-reset');
+let memoryState={moves:0,matches:0,time:0,active:false,locked:false,flipped:[],timer:null};
+
+function formatMemoryTime(seconds){
+  return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`;
+}
+function readMemoryBest(){
+  const best=Number(localStorage.getItem('turminha-memory-best')||0);
+  memoryBest.textContent=best?String(best):'–';
+  return best;
+}
+function updateMemoryStats(){
+  memoryMoves.textContent=memoryState.moves;
+  memoryMatches.textContent=`${memoryState.matches}/${memoryPairs.length}`;
+  memoryTime.textContent=formatMemoryTime(memoryState.time);
+}
+function announceMemory(text){
+  memoryAnnouncement.textContent=text;
+  memoryAnnouncement.classList.remove('pop');
+  requestAnimationFrame(()=>memoryAnnouncement.classList.add('pop'));
+}
+function memoryCardMarkup(pair,kind){
+  const isCharacter=kind==='character';
+  const face=isCharacter
+    ? `<img src="assets/characters/${pair.image}" alt=""><strong>${pair.character}</strong>`
+    : `<span class="memory-symbol" aria-hidden="true">${pair.icon}</span><strong>${pair.material}</strong>`;
+  const label=isCharacter?`Personagem ${pair.character}`:`Símbolo ou material ${pair.material}`;
+  return `<button class="memory-card" type="button" data-memory-pair="${pair.id}" aria-label="Carta virada para baixo: ${label}"><span class="memory-card-inner"><span class="memory-card-face memory-card-back"><span>?</span></span><span class="memory-card-face memory-card-front ${isCharacter?'character':'material'}">${face}</span></span></button>`;
+}
+function renderMemoryCards(){
+  memoryBoard.querySelectorAll('.memory-card').forEach(card=>card.remove());
+  const cards=shuffle(memoryPairs.flatMap(pair=>[
+    {pair,kind:'character'},
+    {pair,kind:'material'}
+  ]));
+  cards.forEach(({pair,kind})=>{
+    memoryBoard.insertAdjacentHTML('beforeend',memoryCardMarkup(pair,kind));
+  });
+}
+function flipMemoryCard(card){
+  if(!memoryState.active||memoryState.locked||card.classList.contains('flipped')||card.classList.contains('matched'))return;
+  card.classList.add('flipped');
+  card.setAttribute('aria-label',card.textContent.trim());
+  memoryState.flipped.push(card);
+  if(memoryState.flipped.length<2)return;
+  memoryState.moves+=1;
+  updateMemoryStats();
+  const [first,second]=memoryState.flipped;
+  if(first.dataset.memoryPair===second.dataset.memoryPair){
+    first.classList.add('matched');
+    second.classList.add('matched');
+    memoryState.flipped=[];
+    memoryState.matches+=1;
+    updateMemoryStats();
+    announceMemory('Par encontrado!');
+    if(memoryState.matches===memoryPairs.length)setTimeout(finishMemoryGame,500);
+    return;
+  }
+  memoryState.locked=true;
+  setTimeout(()=>{
+    first.classList.remove('flipped');
+    second.classList.remove('flipped');
+    first.setAttribute('aria-label','Carta virada para baixo');
+    second.setAttribute('aria-label','Carta virada para baixo');
+    memoryState.flipped=[];
+    memoryState.locked=false;
+  },850);
+}
+function startMemoryGame(){
+  clearInterval(memoryState.timer);
+  memoryState={moves:0,matches:0,time:0,active:true,locked:false,flipped:[],timer:null};
+  memoryTitle.textContent='Memória da Turminha';
+  memoryMessage.textContent='Encontre o símbolo ou material de cada personagem.';
+  memoryStartButton.textContent='Jogar novamente';
+  memoryStart.hidden=true;
+  renderMemoryCards();
+  updateMemoryStats();
+  readMemoryBest();
+  memoryState.timer=setInterval(()=>{
+    if(!memoryState.active)return;
+    memoryState.time+=1;
+    memoryTime.textContent=formatMemoryTime(memoryState.time);
+  },1000);
+}
+function finishMemoryGame(){
+  memoryState.active=false;
+  clearInterval(memoryState.timer);
+  const previousBest=readMemoryBest();
+  if(!previousBest||memoryState.moves<previousBest){
+    localStorage.setItem('turminha-memory-best',String(memoryState.moves));
+    memoryBest.textContent=memoryState.moves;
+  }
+  memoryTitle.textContent='Você encontrou todos!';
+  memoryMessage.textContent=`Foram ${memoryState.moves} jogadas em ${formatMemoryTime(memoryState.time)}.`;
+  memoryStart.hidden=false;
+}
+memoryBoard.addEventListener('click',event=>{
+  const card=event.target.closest('.memory-card');
+  if(card)flipMemoryCard(card);
+});
+memoryStartButton.addEventListener('click',startMemoryGame);
+memoryReset.addEventListener('click',startMemoryGame);
+readMemoryBest();
