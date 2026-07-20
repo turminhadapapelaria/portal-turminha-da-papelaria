@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260719-revisao-1">
+  <link rel="stylesheet" href="styles.css?v=20260719-memoria-1">
 </head>
 <body>
   <header class="site-header">
@@ -121,6 +121,36 @@
       </div>
     </section>
 
+    <section class="memory-game" aria-labelledby="memory-heading">
+      <div class="memory-copy">
+        <p class="eyebrow">Jogo 2</p>
+        <h2 id="memory-heading">Memória da <span>Turminha</span></h2>
+        <p>Combine cada personagem com seu símbolo ou material escolar. Observe bem, encontre os 8 pares e tente superar seu melhor resultado.</p>
+        <div class="memory-feature">
+          <img src="assets/characters/cadu-caderno.webp" alt="Cadu Caderno" loading="lazy">
+          <div><strong>Desafio do Cadu</strong><span>16 cartas e 8 combinações</span></div>
+        </div>
+      </div>
+      <div class="memory-console" aria-label="Jogo Memória da Turminha">
+        <div class="memory-scorebar">
+          <div><span>Jogadas</span><strong id="memory-moves">0</strong></div>
+          <div><span>Pares</span><strong id="memory-matches">0/8</strong></div>
+          <div><span>Tempo</span><strong id="memory-time">0:00</strong></div>
+          <div><span>Recorde</span><strong id="memory-best">–</strong></div>
+          <button class="memory-reset" id="memory-reset" type="button" aria-label="Reiniciar jogo da memória" title="Reiniciar">↻</button>
+        </div>
+        <div class="memory-board" id="memory-board">
+          <div class="memory-start" id="memory-start">
+            <img src="assets/logo-oficial.webp" alt="" aria-hidden="true">
+            <h3 id="memory-title">Memória da Turminha</h3>
+            <p id="memory-message">Encontre o símbolo ou material de cada personagem.</p>
+            <button class="button button-primary" id="memory-start-button" type="button">Começar</button>
+          </div>
+          <div class="memory-announcement" id="memory-announcement" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="comics" id="gibis">
       <div class="comic-cover-wrap">
         <img src="assets/comics/primeira-ideia-1.svg" alt="Capa do gibi A Primeira Ideia de Papelópolis" loading="lazy">
@@ -190,6 +220,6 @@
     </div>
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
-  <script src="script.js?v=20260719-revisao-1"></script>
+  <script src="script.js?v=20260719-memoria-1"></script>
 </body>
 </html>
