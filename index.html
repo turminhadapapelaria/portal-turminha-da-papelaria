@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260719-memoria-2">
+  <link rel="stylesheet" href="styles.css?v=20260720-aventura-1">
 </head>
 <body>
   <header class="site-header">
@@ -92,6 +92,11 @@
     </section>
 
     <section class="games" id="jogos">
+      <nav class="game-picker" aria-label="Escolha um jogo">
+        <a class="active" href="#jogos"><span>1</span> Caça às Tampinhas</a>
+        <a href="#jogo-memoria"><span>2</span> Memória da Turminha</a>
+        <a href="#jogo-aventura"><span>3</span> Aventura em Papelópolis</a>
+      </nav>
       <div class="game-intro">
         <p class="eyebrow">Uma missão em Papelópolis</p>
         <h2>Caça às <span>Tampinhas</span></h2>
@@ -121,7 +126,7 @@
       </div>
     </section>
 
-    <section class="memory-game" aria-labelledby="memory-heading">
+    <section class="memory-game" id="jogo-memoria" aria-labelledby="memory-heading">
       <div class="memory-copy">
         <p class="eyebrow">Jogo 2</p>
         <h2 id="memory-heading">Memória da <span>Turminha</span></h2>
@@ -147,6 +152,44 @@
             <button class="button button-primary" id="memory-start-button" type="button">Começar</button>
           </div>
           <div class="memory-announcement" id="memory-announcement" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="adventure-game" id="jogo-aventura" aria-labelledby="adventure-heading">
+      <div class="adventure-copy">
+        <p class="eyebrow">Jogo 3</p>
+        <h2 id="adventure-heading">Aventura em <span>Papelópolis</span></h2>
+        <p>Guie Lino por três lugares encantados. Recolha todas as ideias brilhantes, desvie das manchas de tinta e encontre o portal para a próxima fase.</p>
+        <div class="adventure-feature">
+          <img src="assets/characters/lino.webp" alt="Lino" loading="lazy">
+          <div><strong>Missão do Lino</strong><span>Bairro, floresta e castelo</span></div>
+        </div>
+      </div>
+      <div class="adventure-console" aria-label="Jogo Aventura em Papelópolis">
+        <div class="adventure-scorebar">
+          <div><span>Pontos</span><strong id="adventure-score">0</strong></div>
+          <div><span>Fase</span><strong id="adventure-level">1/3</strong></div>
+          <div><span>Ideias</span><strong id="adventure-ideas">0/3</strong></div>
+          <div><span>Vidas</span><strong id="adventure-lives">♥♥♥</strong></div>
+          <div><span>Recorde</span><strong id="adventure-best">0</strong></div>
+          <button class="adventure-reset" id="adventure-reset" type="button" aria-label="Reiniciar aventura" title="Reiniciar">↻</button>
+        </div>
+        <div class="adventure-stage" id="adventure-stage">
+          <div class="adventure-grid" id="adventure-grid" role="grid" aria-label="Mapa da aventura"></div>
+          <div class="adventure-start" id="adventure-start">
+            <img src="assets/logo-oficial.webp" alt="" aria-hidden="true">
+            <h3 id="adventure-title">Aventura em Papelópolis</h3>
+            <p id="adventure-message">Ajude Lino a encontrar as ideias e chegar ao portal.</p>
+            <button class="button button-primary" id="adventure-start-button" type="button">Começar aventura</button>
+          </div>
+          <div class="adventure-announcement" id="adventure-announcement" aria-live="polite"></div>
+        </div>
+        <div class="adventure-controls" aria-label="Controles da aventura">
+          <button type="button" data-adventure-move="up" aria-label="Mover para cima" title="Cima">↑</button>
+          <button type="button" data-adventure-move="left" aria-label="Mover para a esquerda" title="Esquerda">←</button>
+          <button type="button" data-adventure-move="down" aria-label="Mover para baixo" title="Baixo">↓</button>
+          <button type="button" data-adventure-move="right" aria-label="Mover para a direita" title="Direita">→</button>
         </div>
       </div>
     </section>
@@ -220,6 +263,6 @@
     </div>
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
-  <script src="script.js?v=20260719-memoria-2"></script>
+  <script src="script.js?v=20260720-aventura-1"></script>
 </body>
 </html>
