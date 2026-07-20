@@ -507,3 +507,194 @@ adventureStartButton.addEventListener('click',startAdventure);
 adventureReset.addEventListener('click',startAdventure);
 readAdventureBest();
 renderAdventure();
+
+const labColors=[
+  {id:'vermelho',name:'Vermelho',color:'#e84a52'},
+  {id:'azul',name:'Azul',color:'#2f6bd8'},
+  {id:'amarelo',name:'Amarelo',color:'#f1c51b'},
+  {id:'branco',name:'Branco',color:'#f4f4ef'}
+];
+const labRecipes=[
+  {name:'Laranja',color:'#f28a23',ingredients:['vermelho','amarelo']},
+  {name:'Verde',color:'#39a95a',ingredients:['amarelo','azul']},
+  {name:'Roxo',color:'#8c4ec6',ingredients:['azul','vermelho']},
+  {name:'Rosa',color:'#f27aa5',ingredients:['vermelho','branco']},
+  {name:'Azul-claro',color:'#73c9e8',ingredients:['azul','branco']}
+];
+const labBottles=document.querySelector('#lab-bottles');
+const labSlotOne=document.querySelector('#lab-slot-one');
+const labSlotTwo=document.querySelector('#lab-slot-two');
+const labResult=document.querySelector('#lab-result');
+const labTargetName=document.querySelector('#lab-target-name');
+const labTargetColor=document.querySelector('#lab-target-color');
+const labMix=document.querySelector('#lab-mix');
+const labClear=document.querySelector('#lab-clear');
+const labFeedback=document.querySelector('#lab-feedback');
+const labScore=document.querySelector('#lab-score');
+const labRound=document.querySelector('#lab-round');
+const labCorrect=document.querySelector('#lab-correct');
+const labLives=document.querySelector('#lab-lives');
+const labBest=document.querySelector('#lab-best');
+const labReset=document.querySelector('#lab-reset');
+const labStart=document.querySelector('#lab-start');
+const labTitle=document.querySelector('#lab-title');
+const labMessage=document.querySelector('#lab-message');
+const labStartButton=document.querySelector('#lab-start-button');
+let labState={recipes:[...labRecipes],index:0,selected:[],score:0,lives:3,active:false,locked:false};
+
+function readLabBest(){
+  const best=Number(localStorage.getItem('turminha-lab-best')||0);
+  labBest.textContent=best;
+  return best;
+}
+function currentLabRecipe(){
+  return labState.recipes[Math.min(labState.index,labState.recipes.length-1)];
+}
+function updateLabStats(){
+  labScore.textContent=labState.score;
+  labRound.textContent=`${Math.min(labState.index+1,labRecipes.length)}/${labRecipes.length}`;
+  labCorrect.textContent=Math.min(labState.index,labRecipes.length);
+  labLives.textContent='♥'.repeat(labState.lives)+'♡'.repeat(3-labState.lives);
+}
+function setLabFeedback(text,type=''){
+  labFeedback.textContent=text;
+  labFeedback.className=`lab-feedback ${type}`.trim();
+}
+function renderLabBottles(){
+  labBottles.innerHTML=labColors.map(color=>{
+    const selected=labState.selected.includes(color.id);
+    return `<button class="lab-bottle${selected?' selected':''}" type="button" data-lab-color="${color.id}" style="--bottle:${color.color}" aria-pressed="${selected}" ${!labState.active||labState.locked?'disabled':''}>${color.name}</button>`;
+  }).join('');
+}
+function renderLabSlot(element,colorId,number){
+  const color=labColors.find(item=>item.id===colorId);
+  if(!color){
+    element.className='lab-slot';
+    element.removeAttribute('style');
+    element.innerHTML=`<span>${number}</span><strong>Escolha</strong>`;
+    return;
+  }
+  element.className='lab-slot filled';
+  element.style.setProperty('--slot-color',color.color);
+  element.innerHTML=`<span aria-hidden="true">✓</span><strong>${color.name}</strong>`;
+}
+function renderLabSelection(){
+  renderLabSlot(labSlotOne,labState.selected[0],1);
+  renderLabSlot(labSlotTwo,labState.selected[1],2);
+  labMix.disabled=!labState.active||labState.locked||labState.selected.length!==2;
+  labClear.disabled=!labState.active||labState.locked||labState.selected.length===0;
+  renderLabBottles();
+}
+function loadLabRecipe(){
+  const recipe=currentLabRecipe();
+  labState.selected=[];
+  labState.locked=false;
+  labTargetName.textContent=recipe.name;
+  labTargetColor.style.background=recipe.color;
+  labResult.className='lab-result';
+  labResult.removeAttribute('style');
+  labResult.innerHTML='<span aria-hidden="true">?</span><strong>Resultado</strong>';
+  setLabFeedback('Escolha dois frascos para criar a cor pedida.');
+  updateLabStats();
+  renderLabSelection();
+}
+function chooseLabColor(colorId){
+  if(!labState.active||labState.locked)return;
+  const selectedIndex=labState.selected.indexOf(colorId);
+  if(selectedIndex>=0)labState.selected.splice(selectedIndex,1);
+  else{
+    if(labState.selected.length===2)labState.selected.shift();
+    labState.selected.push(colorId);
+  }
+  setLabFeedback(labState.selected.length===2?'Fórmula pronta. Acione a máquina!':'Escolha mais um frasco.');
+  renderLabSelection();
+}
+function sameLabIngredients(first,second){
+  return [...first].sort().join('|')===[...second].sort().join('|');
+}
+function finishLabGame(won){
+  labState.active=false;
+  labState.locked=false;
+  const previousBest=readLabBest();
+  if(labState.score>previousBest){
+    localStorage.setItem('turminha-lab-best',String(labState.score));
+    labBest.textContent=labState.score;
+  }
+  labTitle.textContent=won?'Experimentos concluídos!':'O laboratório precisa de você!';
+  labMessage.textContent=won
+    ? `Você descobriu as cinco fórmulas e fez ${labState.score} pontos.`
+    : `Você descobriu ${labState.index} fórmulas e fez ${labState.score} pontos.`;
+  labStartButton.textContent='Jogar novamente';
+  labStart.hidden=false;
+  renderLabSelection();
+}
+function resolveLabMix(){
+  const recipe=currentLabRecipe();
+  const correct=sameLabIngredients(labState.selected,recipe.ingredients);
+  labResult.className='lab-result revealed';
+  labResult.style.setProperty('--result-color',correct?recipe.color:'#616975');
+  labResult.innerHTML=`<span aria-hidden="true">${correct?'✓':'×'}</span><strong>${correct?recipe.name:'Não foi dessa vez'}</strong>`;
+  if(correct){
+    labState.score+=300+labState.lives*50;
+    labState.index+=1;
+    updateLabStats();
+    setLabFeedback('Fórmula correta! Uma nova cor ganhou vida.','success');
+    if(labState.index===labRecipes.length){
+      setTimeout(()=>finishLabGame(true),1000);
+      return;
+    }
+    setTimeout(loadLabRecipe,1000);
+    return;
+  }
+  labState.lives-=1;
+  updateLabStats();
+  setLabFeedback('A mistura não corresponde. Observe a cor e tente outra fórmula.','error');
+  if(labState.lives===0){
+    setTimeout(()=>finishLabGame(false),1000);
+    return;
+  }
+  setTimeout(()=>{
+    labState.selected=[];
+    labState.locked=false;
+    labResult.className='lab-result';
+    labResult.removeAttribute('style');
+    labResult.innerHTML='<span aria-hidden="true">?</span><strong>Resultado</strong>';
+    setLabFeedback('Tente uma nova combinação.');
+    renderLabSelection();
+  },1000);
+}
+function mixLabColors(){
+  if(!labState.active||labState.locked||labState.selected.length!==2)return;
+  labState.locked=true;
+  labResult.className='lab-result mixing';
+  labResult.innerHTML='<span aria-hidden="true">↻</span><strong>Misturando...</strong>';
+  renderLabSelection();
+  setLabFeedback('A máquina está combinando as cores...');
+  setTimeout(resolveLabMix,650);
+}
+function startLabGame(){
+  labState={recipes:shuffle([...labRecipes]),index:0,selected:[],score:0,lives:3,active:true,locked:false};
+  labTitle.textContent='Laboratório do Professor';
+  labMessage.textContent='Você consegue descobrir as cinco fórmulas?';
+  labStartButton.textContent='Jogar novamente';
+  labStart.hidden=true;
+  readLabBest();
+  loadLabRecipe();
+}
+labBottles.addEventListener('click',event=>{
+  const bottle=event.target.closest('[data-lab-color]');
+  if(bottle)chooseLabColor(bottle.dataset.labColor);
+});
+labMix.addEventListener('click',mixLabColors);
+labClear.addEventListener('click',()=>{
+  if(!labState.active||labState.locked)return;
+  labState.selected=[];
+  setLabFeedback('Escolha dois frascos para criar a cor pedida.');
+  renderLabSelection();
+});
+labStartButton.addEventListener('click',startLabGame);
+labReset.addEventListener('click',startLabGame);
+readLabBest();
+loadLabRecipe();
+labState.active=false;
+renderLabSelection();
