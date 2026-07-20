@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260720-aventura-2">
+  <link rel="stylesheet" href="styles.css?v=20260720-laboratorio-1">
 </head>
 <body>
   <header class="site-header">
@@ -96,6 +96,7 @@
         <a class="active" href="#jogos"><span>1</span> Caça às Tampinhas</a>
         <a href="#jogo-memoria"><span>2</span> Memória da Turminha</a>
         <a href="#jogo-aventura"><span>3</span> Aventura em Papelópolis</a>
+        <a href="#jogo-laboratorio"><span>4</span> Laboratório do Professor</a>
       </nav>
       <div class="game-intro">
         <p class="eyebrow">Uma missão em Papelópolis</p>
@@ -194,6 +195,56 @@
       </div>
     </section>
 
+    <section class="lab-game" id="jogo-laboratorio" aria-labelledby="lab-heading">
+      <div class="lab-copy">
+        <p class="eyebrow">Jogo 4</p>
+        <h2 id="lab-heading">Laboratório do <span>Professor Borrachão</span></h2>
+        <p>Descubra as fórmulas das cores. Escolha dois frascos, misture os ingredientes e complete cinco experiências criativas.</p>
+        <div class="lab-feature">
+          <img src="assets/characters/professor-borrachao.webp" alt="Professor Borrachão" loading="lazy">
+          <div><strong>Experimento das Cores</strong><span>Observe, combine e descubra</span></div>
+        </div>
+      </div>
+      <div class="lab-console" aria-label="Jogo Laboratório do Professor Borrachão">
+        <div class="lab-scorebar">
+          <div><span>Pontos</span><strong id="lab-score">0</strong></div>
+          <div><span>Experiência</span><strong id="lab-round">1/5</strong></div>
+          <div><span>Acertos</span><strong id="lab-correct">0</strong></div>
+          <div><span>Tentativas</span><strong id="lab-lives">♥♥♥</strong></div>
+          <div><span>Recorde</span><strong id="lab-best">0</strong></div>
+          <button class="lab-reset" id="lab-reset" type="button" aria-label="Reiniciar laboratório" title="Reiniciar">↻</button>
+        </div>
+        <div class="lab-stage">
+          <div class="lab-target">
+            <span>Cor da experiência</span>
+            <strong id="lab-target-name">Verde</strong>
+            <i id="lab-target-color" aria-hidden="true"></i>
+          </div>
+          <div class="lab-machine" aria-label="Máquina de misturar cores">
+            <div class="lab-slot" id="lab-slot-one"><span>1</span><strong>Escolha</strong></div>
+            <b aria-hidden="true">+</b>
+            <div class="lab-slot" id="lab-slot-two"><span>2</span><strong>Escolha</strong></div>
+            <b aria-hidden="true">=</b>
+            <div class="lab-result" id="lab-result"><span aria-hidden="true">?</span><strong>Resultado</strong></div>
+          </div>
+          <div class="lab-bottles" id="lab-bottles" aria-label="Frascos de cores"></div>
+          <div class="lab-actions">
+            <button class="lab-clear" id="lab-clear" type="button">Limpar</button>
+            <button class="button button-primary" id="lab-mix" type="button" disabled>Misturar cores</button>
+          </div>
+          <div class="lab-feedback" id="lab-feedback" aria-live="polite">Escolha dois frascos para começar.</div>
+          <div class="lab-start" id="lab-start">
+            <img src="assets/characters/professor-borrachao.webp" alt="" aria-hidden="true">
+            <div>
+              <h3 id="lab-title">Laboratório do Professor</h3>
+              <p id="lab-message">Você consegue descobrir as cinco fórmulas?</p>
+              <button class="button button-primary" id="lab-start-button" type="button">Começar experiências</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="comics" id="gibis">
       <div class="comic-cover-wrap">
         <img src="assets/comics/primeira-ideia-1.svg" alt="Capa do gibi A Primeira Ideia de Papelópolis" loading="lazy">
@@ -263,6 +314,6 @@
     </div>
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
-  <script src="script.js?v=20260720-aventura-2"></script>
+  <script src="script.js?v=20260720-laboratorio-1"></script>
 </body>
 </html>
